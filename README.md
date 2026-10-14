@@ -12,36 +12,74 @@ Deep Learning (IF25-40401) · Teknik Informatika ITERA · Semester Ganjil 2026/2
 
 ## Ringkasan Pendekatan
 
-- **Arsitektur / backbone**: (mis. ResNet-50 pretrained ImageNet, CNN from scratch, ...)
-- **Strategi pelatihan**: (freezing, learning rate, scheduler, epoch, augmentasi, ...)
-- **Data tambahan**: (tidak ada / sebutkan sumber dan jumlahnya)
-- **Ukuran input & preprocessing**:
+Proyek ini menggunakan **ConvNeXt-Tiny pretrained ImageNet-1K** dengan pendekatan transfer learning dan fine-tuning untuk mengklasifikasikan gambar sampah ke dalam lima kelas:
+
+1. `botol_plastik`
+2. `gelas_plastik`
+3. `kertas_kardus`
+4. `saset_kemasan`
+5. `styrofoam`
+
+- **Arsitektur / backbone**: ConvNeXt-Tiny (pretrained ImageNet-1K)
+- **Strategi pelatihan**: Model dilatih menggunakan data training yang telah diaudit dan dibagi menjadi training set serta validation set. Strategi pelatihan menggunakan tahap warmup pada classification head, dilanjutkan dengan fine-tuning seluruh model.
+- **Data tambahan**: Tidak ada (hanya menggunakan dataset yang disediakan untuk kompetisi).
+- **Ukuran input & preprocessing**: 224x224 (Resize 236 bilinear + CenterCrop 224 + Normalisasi ImageNet)
+
+## Pretrained Model dan Sumber Data
+
+- **Arsitektur pretrained:** ConvNeXt-Tiny, ImageNet-1K.
+- **Dataset:** Dataset yang disediakan untuk kompetisi.
+- **Data tambahan:** Tidak ada.
 
 ## Hasil
 
-| Putaran            | Commit | Macro-F1 (split validasi lokal) | Macro-F1 (diumumkan asisten) |
-| ------------------ | ------ | ------------------------------- | ---------------------------- |
-| Preview 1 (14 Okt) |        |                                 |                              |
-| Preview 2 (21 Okt) |        |                                 |                              |
-| Final (25 Okt)     |        |                                 |                              |
+| Putaran            | Commit    | Macro-F1 (split validasi lokal) | Macro-F1 (diumumkan asisten) |
+| ------------------ | --------- | ------------------------------- | ---------------------------- |
+| Preview 1 (14 Okt) | `50e8a37` | 97,83%                          |                              |
+| Preview 2 (21 Okt) |           |                                 |                              |
+| Final (25 Okt)     |           |                                 |                              |
+
+### Hasil Validasi Lokal
+
+| Metrik | Hasil |
+|---|---:|
+| Best Validation Macro-F1 | 97,83% |
+| Validation Accuracy | 97,82% |
+| Jumlah gambar validasi | 551 |
+
+*Catatan: hasil di atas merupakan hasil validasi lokal, bukan hasil hidden validation set kompetisi.*
 
 Catatan eksperimen singkat (apa yang dicoba, apa yang berhasil/gagal):
+- Eksperimen backbone ConvNeXt-Tiny menunjukkan konvergensi dan separasi fitur yang sangat baik pada klasifikasi 5 kelas sampah.
+- Penyesuaian preprocessing (Resize 236 -> CenterCrop 224) menjaga konsistensi aspect ratio dan fitur gambar.
 
-## Cara Reproduksi
+## Cara Reproduksi Evaluasi
+
+Pastikan Python dan dependensi yang diperlukan telah terpasang, serta data validasi tersedia dalam struktur folder sesuai nama kelas yang ditetapkan.
 
 ```bash
-pip install -r requirements.txt
-python train.py ...            # perintah melatih model
 python evaluate.py --submission ./submission --data ./my_val
 ```
+
+Ganti `./my_val` dengan direktori validation set lokal.
 
 ## Struktur Repositori
 
 ```
 submission/
-  model.py          # get_model() dan get_transform()
-  model.pth         # state_dict model terbaik
-  requirements.txt  # (opsional) paket tambahan, mis. timm
+  model.py          # mendefinisikan get_model() dan get_transform() sesuai kontrak evaluator
+  model.pth         # bobot model hasil fine-tuning, disimpan menggunakan Git LFS
 evaluate.py         # salinan skrip evaluasi resmi
-...                 # kode/notebook pelatihan kelompok
 ```
+
+Catatan berkas:
+- `submission/model.py`: mendefinisikan `get_model()` dan `get_transform()` sesuai kontrak evaluator.
+- `submission/model.pth`: bobot model hasil fine-tuning, disimpan menggunakan Git LFS.
+
+## Teknologi
+
+- Python
+- PyTorch
+- Torchvision
+- Pillow
+- Git LFS
