@@ -1,21 +1,19 @@
-import torch
+from torch import nn
+from torchvision import models, transforms
+from torchvision.transforms import InterpolationMode
 
-model = None  # global variable untuk menyimpan model
-
+IMAGE_SIZE = 224
+CLASSES = ['botol_plastik', 'gelas_plastik', 'kertas_kardus', 'saset_kemasan', 'styrofoam']
 
 def get_model():
-    """Bangun arsitektur saja — JANGAN mengunduh bobot atau memuat model.pth di sini."""
-    ...
-    return model  # output: logits [batch, 5]
-
+    model = models.convnext_tiny(weights=None)
+    model.classifier[2] = nn.Linear(model.classifier[2].in_features, 5)
+    return model
 
 def get_transform():
-    """Transform validasi: PIL.Image (RGB) -> Tensor [3, H, W]."""
-    ...
-
-
-# Urutan kelas (alfabetis, sama dengan torchvision ImageFolder):
-# 0 botol_plastik · 1 gelas_plastik · 2 kertas_kardus · 3 saset_kemasan · 4 styrofoam
-
-# Simpan bobot dengan:
-torch.save(model.state_dict(), "submission/model.pth")
+    return transforms.Compose([
+        transforms.Resize(round(IMAGE_SIZE * 236 / 224), interpolation=InterpolationMode.BILINEAR),
+        transforms.CenterCrop(IMAGE_SIZE),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ])
