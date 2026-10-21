@@ -60,23 +60,35 @@ Proyek ini menggunakan arsitektur **Quad-Paradigm Hybrid Super-Ensemble (@ 224x2
 
 | Putaran            | Commit    | Macro-F1 (split validasi lokal) | Macro-F1 (diumumkan asisten) |
 | ------------------ | --------- | ------------------------------- | ---------------------------- |
-| Preview 1 (14 Okt) | `50e8a37` | 97,83%                          |                              |
-| Preview 2 (21 Okt) | `3531a43` / `main` | *(Quad-Paradigm Super-Ensemble)* |                              |
+| Preview 1 (14 Okt) | `50e8a37` | 97,83%                          | 95,25%                       |
+| Preview 2 (21 Okt) | `055ac11` | 98,90%                          |                              |
 | Final (25 Okt)     |           |                                 |                              |
 
 ### Hasil Validasi Lokal
 
+#### Preview 2 (21 Okt — Quad-Paradigm Super-Ensemble)
+
 | Metrik | Hasil |
 |---|---:|
-| Best Validation Macro-F1 (Preview 1 Baseline) | 97,83% |
-| Validation Accuracy (Preview 1 Baseline) | 97,82% |
+| Best Validation Macro-F1 | 98,90% (0.9890) |
+| Validation Accuracy | 98,91% (545/551 gambar benar) |
+| Jumlah gambar validasi | 551 |
+
+*Catatan: Skor baseline kompetisi ResNet-18 = 0.9200 (92,00%).*
+
+#### Preview 1 (14 Okt — Baseline ConvNeXt-Tiny)
+
+| Metrik | Hasil |
+|---|---:|
+| Best Validation Macro-F1 | 97,83% (Asistensi: 95,25%) |
+| Validation Accuracy | 97,82% (Asistensi: 95,28%) |
 | Jumlah gambar validasi | 551 |
 
 *Catatan: hasil di atas merupakan hasil validasi lokal, bukan hasil hidden validation set kompetisi.*
 
 Catatan eksperimen singkat (apa yang dicoba, apa yang berhasil/gagal):
-- **Eksperimen Backbone Tunggal (Preview 1)**: ConvNeXt-Tiny menunjukkan konvergensi awal yang sangat kuat dengan Macro-F1 97,83% pada 551 gambar validasi.
-- **Transisi ke Quad-Paradigm Hybrid Ensemble (Preview 2)**: Menggabungkan keunggulan representasi lokal dari CNN (`convnext_tiny` & `tf_efficientnetv2_s`) dengan representasi global transformer (`deit3_small` & `swin_s`) untuk mengurangi false positive antarkelas yang mirip (seperti `gelas_plastik` vs `styrofoam` transparan/putih).
+- **Eksperimen Backbone Tunggal (Preview 1)**: ConvNeXt-Tiny menunjukkan konvergensi awal yang kuat dengan Macro-F1 validasi lokal 97,83% (akurasi 97,82%) serta skor resmi asisten Macro-F1 95,25% (akurasi 95,28%).
+- **Transisi ke Quad-Paradigm Hybrid Ensemble (Preview 2)**: Menggabungkan keunggulan representasi lokal dari CNN (`convnext_tiny` & `tf_efficientnetv2_s`) dengan representasi global transformer (`deit3_small` & `swin_s`) melonjakkan Macro-F1 validasi lokal ke 98,90% dan akurasi 98,91% (545/551 benar).
 - **Penanganan Orientasi Kamera (ExifTranspose)**: Integrasi transformasi EXIF otomatis meniadakan penurunan akurasi pada gambar smartphone yang tersimpan dalam rotasi landscape/portrait metadata.
 - **Aspect-Rectified Test-Time Augmentation (TTA)**: Penggunaan multi-view TTA (terutama aspect-tall crop dan texture-zoom) meningkatkan ketahanan prediksi terhadap variasi framing dan skala objek di lapangan.
 - **Optimasi Bobot FP16**: Seluruh bobot keempat model berhasil dikompilasi ke dalam format FP16 sebesar ~227.2 MB, jauh di bawah batas maksimum 500 MB.
